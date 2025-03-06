@@ -14,6 +14,16 @@ import {
 } from 'lucide-react';
 
 const Navbar = () => {
+  // Improved Color Palette for better readability
+  const colors = {
+    background: '#F5E6E0',  // Lighter background
+    secondary: '#2C1B3A',   // Deeper, more saturated background
+    primary: '#8B2D5A',     // Brighter primary color
+    accent: '#C7556D',      // More vibrant accent
+    text: '#FFFFFF',        // White text for better contrast
+    iconColor: '#E9BCB9'    // Soft icon color
+  };
+
   const [isOpen, setIsOpen] = useState(false);
 
   // Improved scroll prevention and cleanup
@@ -43,7 +53,7 @@ const Navbar = () => {
 
   const navItems = [
     { icon: <Home size={20} />, text: 'Home', link: '/' },
-    { icon: <Search size={20} />, text: 'Find', link: '/find-policies' },
+    { icon: <Search size={20} />, text: 'Find', link: '/find' },
     { icon: <Bot size={20} />, text: 'AI', link: '/chatbot' },
     { icon: <BarChart2 size={20} />, text: 'Dashboard', link: '/dashboard' },
     { icon: <FileText size={20} />, text: 'Legal', link: '/legal' },
@@ -107,7 +117,11 @@ const Navbar = () => {
 
   return (
     <header 
-      className="bg-gradient-to-r from-blue-600 to-blue-700 shadow-md fixed top-0 left-0 right-0 z-40"
+      className="shadow-md fixed top-0 left-0 right-0 z-40"
+      style={{ 
+        backgroundColor: colors.secondary,
+        color: colors.text
+      }}
       role="banner"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -119,7 +133,13 @@ const Navbar = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="text-white font-bold text-xl" aria-label="PolicyNavigator">PolicyNavigator</span>
+            <span 
+              className="font-bold text-xl" 
+              aria-label="PolicyNavigator"
+              style={{ color: colors.text }}
+            >
+              PolicyNavigator
+            </span>
           </motion.div>
           
           {/* Desktop Navigation */}
@@ -131,15 +151,26 @@ const Navbar = () => {
               <motion.a
                 key={index}
                 href={item.link}
-                className="flex items-center text-blue-100 hover:text-white px-2 py-1 rounded-md text-sm font-medium transition-colors"
+                className="flex items-center px-2 py-1 rounded-md text-sm font-medium transition-colors"
+                style={{ 
+                  color: colors.text,
+                  opacity: 0.9
+                }}
                 whileHover={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  scale: 1.05
+                  backgroundColor: `${colors.accent}20`,
+                  scale: 1.05,
+                  opacity: 1
                 }}
                 whileTap={{ scale: 0.95 }}
                 aria-label={item.text}
               >
-                <span className="mr-2" aria-hidden="true">{item.icon}</span>
+                <span 
+                  className="mr-2" 
+                  aria-hidden="true"
+                  style={{ color: colors.iconColor }}
+                >
+                  {item.icon}
+                </span>
                 {item.text}
               </motion.a>
             ))}
@@ -147,8 +178,12 @@ const Navbar = () => {
             {/* Sign In Button */}
             <motion.a
               href="/signin"
-              className="flex items-center bg-white text-blue-700 px-4 py-2 rounded-md text-sm font-medium shadow-md"
-              whileHover={{ scale: 1.05, backgroundColor: '#f8fafc' }}
+              className="flex items-center px-4 py-2 rounded-md text-sm font-medium shadow-lg"
+              style={{ 
+                backgroundColor: colors.primary,
+                color: colors.text
+              }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               aria-label="Sign In"
             >
@@ -161,7 +196,11 @@ const Navbar = () => {
           <div className="flex md:hidden">
             <motion.button
               onClick={toggleMenu}
-              className="text-blue-100 hover:text-white p-2 focus:outline-none focus:ring-2 focus:ring-white"
+              className="p-2 focus:outline-none focus:ring-2"
+              style={{
+                color: colors.text
+              }}
+              whileHover={{ color: colors.iconColor }}
               whileTap={{ scale: 0.9 }}
               aria-label={isOpen ? "Close menu" : "Open menu"}
               aria-expanded={isOpen}
@@ -191,14 +230,15 @@ const Navbar = () => {
       {/* Mobile Navigation Menu */}
       <motion.nav
         id="mobile-menu"
-        className="md:hidden fixed inset-x-0 top-16 bg-blue-800 shadow-lg z-50 overflow-hidden"
+        className="md:hidden fixed inset-x-0 top-16 shadow-lg z-50 overflow-hidden"
+        style={{
+          backgroundColor: colors.secondary,
+          maxHeight: isOpen ? 'calc(100vh - 4rem)' : 0,
+          top: '4rem'
+        }}
         initial="closed"
         animate={isOpen ? "open" : "closed"}
         variants={navVariants}
-        style={{ 
-          maxHeight: isOpen ? 'calc(100vh - 4rem)' : 0,
-          top: '4rem' // Ensures menu starts below the header
-        }}
         aria-label="Mobile Navigation"
         role="navigation"
       >
@@ -207,13 +247,27 @@ const Navbar = () => {
             <motion.a
               key={index}
               href={item.link}
-              className="flex items-center text-blue-100 hover:text-white hover:bg-blue-700 px-3 py-3 rounded-md text-base font-medium transition-colors"
+              className="flex items-center px-3 py-3 rounded-md text-base font-medium transition-colors"
+              style={{ 
+                color: colors.text,
+                opacity: 0.9
+              }}
               variants={itemVariants}
+              whileHover={{ 
+                backgroundColor: `${colors.accent}20`,
+                opacity: 1
+              }}
               whileTap={{ scale: 0.98 }}
               onClick={toggleMenu}
               aria-label={item.text}
             >
-              <span className="mr-3" aria-hidden="true">{item.icon}</span>
+              <span 
+                className="mr-3" 
+                aria-hidden="true"
+                style={{ color: colors.iconColor }}
+              >
+                {item.icon}
+              </span>
               {item.text}
             </motion.a>
           ))}
@@ -221,9 +275,13 @@ const Navbar = () => {
           {/* Sign In Button */}
           <motion.a
             href="/signin"
-            className="flex items-center justify-center w-full bg-white text-blue-700 mt-6 px-4 py-3 rounded-md text-base font-medium shadow-md"
+            className="flex items-center justify-center w-full mt-6 px-4 py-3 rounded-md text-base font-medium shadow-lg"
+            style={{ 
+              backgroundColor: colors.primary,
+              color: colors.text
+            }}
             variants={itemVariants}
-            whileHover={{ backgroundColor: '#f8fafc' }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
             aria-label="Sign In"
           >
