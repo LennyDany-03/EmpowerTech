@@ -2,41 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Search, 
-  Filter, 
   Bot, 
-  Star, 
-  SlidersHorizontal, 
-  ChevronDown 
+  Star
 } from 'lucide-react';
 import NavBar from '../components/NavBar';
-
-// Mock data for policies (would typically come from a backend)
-const samplePolicies = [
-  {
-    id: 1,
-    name: "Young Entrepreneur Scholarship",
-    category: "Financial",
-    description: "Funding for young entrepreneurs to start their business ventures.",
-    eligibility: "Age 18-35, Business Idea Proposal",
-    tags: ["startup", "business", "funding"]
-  },
-  {
-    id: 2,
-    name: "Student Education Grant",
-    category: "Education",
-    description: "Financial support for students pursuing higher education.",
-    eligibility: "Annual family income below $50,000, Full-time student",
-    tags: ["student", "education", "scholarship"]
-  },
-  {
-    id: 3,
-    name: "Small Business Support Program",
-    category: "Financial",
-    description: "Comprehensive support for small and medium enterprises.",
-    eligibility: "Registered business, Operating for less than 5 years",
-    tags: ["business", "msme", "support"]
-  }
-];
+import { supabase } from '../lib/supabaseClient';
 
 const FindPage = () => {
   // Color Palette from HomePage
@@ -57,10 +27,37 @@ const FindPage = () => {
     interests: []
   });
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredPolicies, setFilteredPolicies] = useState(samplePolicies);
+  const [policies, setPolicies] = useState([]);
+  const [filteredPolicies, setFilteredPolicies] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortMethod, setSortMethod] = useState('Relevance');
   const [savedPolicies, setSavedPolicies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch policies from Supabase
+  useEffect(() => {
+    const fetchPolicies = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('policies')
+          .select('*');
+
+        if (error) throw error;
+
+        setPolicies(data || []);
+        setFilteredPolicies(data || []);
+      } catch (err) {
+        console.error('Error fetching policies:', err);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPolicies();
+  }, []);
 
   // Form input handler
   const handleInputChange = (e) => {
@@ -73,7 +70,7 @@ const FindPage = () => {
 
   // Search and filter handler
   useEffect(() => {
-    let result = samplePolicies;
+    let result = policies;
 
     // Filter by category
     if (selectedCategory !== 'All') {
@@ -104,7 +101,7 @@ const FindPage = () => {
     }
 
     setFilteredPolicies(result);
-  }, [searchQuery, selectedCategory, sortMethod]);
+  }, [searchQuery, selectedCategory, sortMethod, policies]);
 
   // Save policy handler
   const toggleSavePolicy = (policy) => {
@@ -138,6 +135,35 @@ const FindPage = () => {
       }
     }
   };
+
+  // Loading and error states
+  if (loading) {
+    return (
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{ 
+          backgroundColor: colors.background,
+          color: colors.text
+        }}
+      >
+        <p>Loading policies...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{ 
+          backgroundColor: colors.background,
+          color: colors.text
+        }}
+      >
+        <p>Error loading policies: {error.message}</p>
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -179,10 +205,7 @@ const FindPage = () => {
               style={{ 
                 backgroundColor: `${colors.secondary}10`,
                 borderColor: `${colors.primary}30`,
-                color: colors.text,
-                ':focus': {
-                  ringColor: colors.accent
-                }
+                color: colors.text
               }}
             />
             <select 
@@ -277,70 +300,76 @@ const FindPage = () => {
         </div>
 
         {/* Policy Results */}
-        <motion.div 
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          {filteredPolicies.map((policy) => (
-            <motion.div 
-              key={policy.id}
-              variants={itemVariants}
-              className="rounded-xl p-6 shadow-md hover:shadow-xl transition-all"
-              style={{ 
-                backgroundColor: `${colors.secondary}20`,
-                color: colors.text
-              }}
-            >
-              <div className="flex justify-between items-center mb-4">
-                <span 
-                  className="px-3 py-1 rounded-full text-sm"
-                  style={{ 
-                    backgroundColor: `${colors.accent}20`,
-                    color: colors.accent
-                  }}
-                >
-                  {policy.category}
-                </span>
-                <button 
-                  onClick={() => toggleSavePolicy(policy)}
-                  className={`hover:text-yellow-500 transition-colors ${
-                    savedPolicies.some(p => p.id === policy.id) 
-                      ? 'text-yellow-500' 
-                      : 'text-gray-400'
-                  }`}
-                >
-                  <Star size={20} />
-                </button>
-              </div>
-              <h3 className="text-xl font-bold mb-2">{policy.name}</h3>
-              <p className="opacity-80 mb-4">{policy.description}</p>
-              <div className="mb-4">
-                <h4 
-                  className="font-semibold"
-                  style={{ color: colors.primary }}
-                >
-                  Eligibility
-                </h4>
-                <p className="text-sm opacity-80">{policy.eligibility}</p>
-              </div>
-              <button 
-                className="w-full py-2 rounded-lg transition-colors"
+        {filteredPolicies.length === 0 ? (
+          <div 
+            className="text-center py-12"
+            style={{ color: colors.text }}
+          >
+            No policies found matching your search.
+          </div>
+        ) : (
+          <motion.div 
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            {filteredPolicies.map((policy) => (
+              <motion.div 
+                key={policy.id}
+                variants={itemVariants}
+                className="rounded-xl p-6 shadow-md hover:shadow-xl transition-all"
                 style={{ 
-                  backgroundColor: colors.primary,
-                  color: '#FFFFFF',
-                  ':hover': {
-                    backgroundColor: colors.accent
-                  }
+                  backgroundColor: `${colors.secondary}20`,
+                  color: colors.text
                 }}
               >
-                Read More
-              </button>
-            </motion.div>
-          ))}
-        </motion.div>
+                <div className="flex justify-between items-center mb-4">
+                  <span 
+                    className="px-3 py-1 rounded-full text-sm"
+                    style={{ 
+                      backgroundColor: `${colors.accent}20`,
+                      color: colors.accent
+                    }}
+                  >
+                    {policy.category}
+                  </span>
+                  <button 
+                    onClick={() => toggleSavePolicy(policy)}
+                    className={`hover:text-yellow-500 transition-colors ${
+                      savedPolicies.some(p => p.id === policy.id) 
+                        ? 'text-yellow-500' 
+                        : 'text-gray-400'
+                    }`}
+                  >
+                    <Star size={20} />
+                  </button>
+                </div>
+                <h3 className="text-xl font-bold mb-2">{policy.name}</h3>
+                <p className="opacity-80 mb-4">{policy.description}</p>
+                <div className="mb-4">
+                  <h4 
+                    className="font-semibold"
+                    style={{ color: colors.primary }}
+                  >
+                    Eligibility
+                  </h4>
+                  <p className="text-sm opacity-80">{policy.eligibility}</p>
+                </div>
+                <button 
+                  className="w-full py-2 rounded-lg transition-colors"
+                  style={{ 
+                    backgroundColor: colors.primary,
+                    color: '#FFFFFF'
+                  }}
+                >
+                  Read More
+                </button>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
 
         {/* AI Assistance Section */}
         <motion.div 
@@ -366,10 +395,7 @@ const FindPage = () => {
             className="px-6 py-3 rounded-lg transition-colors flex items-center mx-auto"
             style={{ 
               backgroundColor: colors.primary,
-              color: '#FFFFFF',
-              ':hover': {
-                backgroundColor: colors.accent
-              }
+              color: '#FFFFFF'
             }}
           >
             Chat with AI Assistant <Bot className="ml-2" />
