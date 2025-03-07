@@ -18,6 +18,7 @@ import {
 import NavBar from '../components/NavBar';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
+import ViewDetailPolicy from '../components/ViewDetailPolicy'; // Import the new component
 
 const FindPage = () => {
   // Color Palette (same as Legal and HomePage)
@@ -74,6 +75,10 @@ const FindPage = () => {
   const [error, setError] = useState(null);
   const [policies, setPolicies] = useState([]);
   const [filteredPolicies, setFilteredPolicies] = useState([]);
+  
+  // New state for view detail modal
+  const [selectedPolicy, setSelectedPolicy] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   // Map icon names to actual Lucide components
   const getIconComponent = (iconName) => {
@@ -129,62 +134,68 @@ const FindPage = () => {
     }));
   };
 
-  // Search and filter handler
-  useEffect(() => {
-    if (!policies.length) return;
-    
-    let result = [...policies]; // Create a copy to avoid mutating the original
+// Search and filter handler - Fixed version
+useEffect(() => {
+  if (!policies.length) return;
+  
+  let result = [...policies]; // Create a copy to avoid mutating the original
 
-    // Filter by category
-    if (selectedCategory !== 'All') {
-      result = result.filter(policy => policy.category === selectedCategory);
-    }
+  // Filter by category - Fix: Make case-insensitive comparison
+  if (selectedCategory !== 'All') {
+    result = result.filter(policy => 
+      policy.category.toLowerCase() === selectedCategory.toLowerCase()
+    );
+  }
 
-    // Search filter
-    if (searchQuery) {
-      const lowercaseQuery = searchQuery.toLowerCase();
-      result = result.filter(policy => 
-        policy.name.toLowerCase().includes(lowercaseQuery) ||
-        policy.description.toLowerCase().includes(lowercaseQuery) ||
-        policy.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery))
-      );
-    }
+  // Search filter
+  if (searchQuery) {
+    const lowercaseQuery = searchQuery.toLowerCase();
+    result = result.filter(policy => 
+      policy.name.toLowerCase().includes(lowercaseQuery) ||
+      policy.description.toLowerCase().includes(lowercaseQuery) ||
+      policy.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery))
+    );
+  }
 
-    // Sorting
-    switch (sortMethod) {
-      case 'Latest':
-        result.sort((a, b) => b.id - a.id); // Higher id is newer
-        break;
-      case 'Most Popular':
-        // In a real app, you'd have a popularity field or join with a views/saves table
-        result.sort((a, b) => (a.id % 3) - (b.id % 3)); // Just a mock sorting for demo
-        break;
-      case 'Relevance':
-      default:
-        // For relevance, we'll use a simple approach based on match with user interests
-        if (formData.interests.length > 0) {
-          result.sort((a, b) => {
-            // Check if tags match any user interests
-            const aMatches = a.tags.filter(tag => 
-              formData.interests.some(interest => 
-                tag.toLowerCase().includes(interest.toLowerCase())
-              )
-            ).length;
-            
-            const bMatches = b.tags.filter(tag => 
-              formData.interests.some(interest => 
-                tag.toLowerCase().includes(interest.toLowerCase())
-              )
-            ).length;
-            
-            return bMatches - aMatches; // Higher matches first
-          });
-        }
-        break;
-    }
+  // Sorting
+  switch (sortMethod) {
+    case 'Latest':
+      result.sort((a, b) => b.id - a.id); // Higher id is newer
+      break;
+    case 'Most Popular':
+      // In a real app, you'd have a popularity field or join with a views/saves table
+      result.sort((a, b) => (a.id % 3) - (b.id % 3)); // Just a mock sorting for demo
+      break;
+    case 'Relevance':
+    default:
+      // For relevance, we'll use a simple approach based on match with user interests
+      if (formData.interests.length > 0) {
+        result.sort((a, b) => {
+          // Check if tags match any user interests
+          const aMatches = a.tags.filter(tag => 
+            formData.interests.some(interest => 
+              tag.toLowerCase().includes(interest.toLowerCase())
+            )
+          ).length;
+          
+          const bMatches = b.tags.filter(tag => 
+            formData.interests.some(interest => 
+              tag.toLowerCase().includes(interest.toLowerCase())
+            )
+          ).length;
+          
+          return bMatches - aMatches; // Higher matches first
+        });
+      }
+      break;
+  }
 
-    setFilteredPolicies(result);
-  }, [searchQuery, selectedCategory, sortMethod, policies, formData.interests]);
+  // Debug log to check filtered result
+  console.log('Filtering with category:', selectedCategory);
+  console.log('Filtered policies:', result.length);
+  
+  setFilteredPolicies(result);
+}, [searchQuery, selectedCategory, sortMethod, policies, formData.interests]);
 
   // Save policy handler
   const toggleSavePolicy = async (policy) => {
@@ -265,6 +276,12 @@ const FindPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // New function to handle opening the detail view
+  const openPolicyDetail = (policy) => {
+    setSelectedPolicy(policy);
+    setIsDetailModalOpen(true);
   };
 
   // Loading state
@@ -592,6 +609,14 @@ const FindPage = () => {
             <button 
               className="ml-3 flex items-center text-sm"
               style={{ color: colors.primary }}
+              onClick={() => {
+                // Debug helper - log the current state to console
+                console.log("Current state:", {
+                  selectedCategory,
+                  filteredPolicies,
+                  allPolicies: policies
+                });
+              }}
             >
               <Filter size={16} className="mr-1" />
               Advanced Filters
@@ -599,6 +624,7 @@ const FindPage = () => {
           </div>
         </div>
 
+        {/* Check if we have policies to display */}
         {filteredPolicies.length === 0 ? (
           <div 
             className="bg-white rounded-xl shadow-xl p-8 text-center"
@@ -623,19 +649,12 @@ const FindPage = () => {
             </button>
           </div>
         ) : (
-          <motion.div 
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
+          // Simpler version without complex animations first to debug
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPolicies.map((policy) => (
-              <motion.div 
+              <div 
                 key={policy.id}
-                variants={itemVariants}
-                className="bg-white rounded-xl shadow-md overflow-hidden transition-all"
-                whileHover={{ y: -5 }}
+                className="bg-white rounded-xl shadow-md overflow-hidden transition-all hover:-translate-y-1"
               >
                 {/* Simple colored header with title and category */}
                 <div 
@@ -692,7 +711,7 @@ const FindPage = () => {
                   
                   {/* Tags */}
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {policy.tags.slice(0, 3).map((tag, index) => (
+                    {policy.tags && policy.tags.slice(0, 3).map((tag, index) => (
                       <span 
                         key={index}
                         className="text-xs px-2 py-1 rounded-full"
@@ -706,22 +725,21 @@ const FindPage = () => {
                     ))}
                   </div>
                   
-                  {/* Simple action button */}
-                  <motion.button
+                  {/* View Detail Button */}
+                  <button
                     className="w-full py-2 rounded-lg text-sm font-medium text-center"
                     style={{ 
                       backgroundColor: colors.primary,
                       color: 'white'
                     }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    onClick={() => openPolicyDetail(policy)}
                   >
                     View Details
-                  </motion.button>
+                  </button>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         )}
 
         {/* AI Assistance Section */}
@@ -791,6 +809,15 @@ const FindPage = () => {
           </div>
         </motion.div>
       </div>
+
+      {/* Policy Detail Modal */}
+      <ViewDetailPolicy 
+        policy={selectedPolicy}
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        savedPolicies={savedPolicies}
+        toggleSavePolicy={toggleSavePolicy}
+      />
     </div>
   );
 };
