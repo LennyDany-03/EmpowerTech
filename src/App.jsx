@@ -9,6 +9,12 @@ import ChatBot from './pages/Chatbot'
 
 import WorkerRights from './pages/Worker-Rights'
 import TenantRights from './pages/TenderRights'
+import ConsumerRights from './pages/ConsumerRights'
+import CyberLaw from './pages/CyberLaw'
+import WomenRights from './pages/WomenRights'
+import SeinorRights from './pages/SeniorRights'
+import RightToInformation from './pages/RightToInformation'
+import LowIncome from './pages/LowIncome'
 
 export const App = () => {
   return (
@@ -22,6 +28,12 @@ export const App = () => {
             <Route  path='/chatbot' element={<ChatBot />}/>
             <Route  path='/workers-rights' element={<WorkerRights />}/>
             <Route  path='/tenant-rights' element={<TenantRights />}/>
+            <Route  path='/consumer-rights' element={<ConsumerRights />}/>
+            <Route  path='/cyber-laws' element={<CyberLaw />}/>
+            <Route  path='/womens-rights' element={<WomenRights />}/>
+            <Route  path='/senior-rights' element={<SeinorRights />}/>
+            <Route  path='/rti' element={<RightToInformation />}/>
+            <Route  path='/legal-aid' element={<LowIncome />}/>
         </Routes>
       </Router>
     </>

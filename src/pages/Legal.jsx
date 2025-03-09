@@ -241,21 +241,23 @@ const Legal = () => {
                 <FileText className="mr-2" size={20} />
                 File a Complaint
               </motion.button>
-              <motion.button 
-                className="border-2 px-6 py-3 rounded-lg font-medium flex items-center justify-center"
-                style={{ 
-                  borderColor: colors.primary, 
-                  color: colors.text 
-                }}
-                whileHover={{ 
-                  scale: 1.05, 
-                  backgroundColor: `${colors.primary}20` 
-                }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Bot className="mr-2" size={20} />
-                Ask Our AI
-              </motion.button>
+              <a href="/chatbot">
+                <motion.button 
+                  className="border-2 px-6 py-3 rounded-lg font-medium flex items-center justify-center"
+                  style={{ 
+                    borderColor: colors.primary, 
+                    color: colors.text 
+                  }}
+                  whileHover={{ 
+                    scale: 1.05, 
+                    backgroundColor: `${colors.primary}20` 
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Bot className="mr-2" size={20} />
+                  Ask Our AI
+                </motion.button>
+              </a>
             </div>
           </motion.div>
         </div>
