@@ -1,18 +1,17 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home, 
   Search, 
   Bot, 
+  BarChart2, 
   FileText, 
   Gamepad2, 
   Mail, 
   LogIn,
   Menu,
-  X,
-  Globe
+  X
 } from 'lucide-react';
-import { LanguageContext } from '../contexts/LanguageContext';
 
 const Navbar = () => {
   // Improved Color Palette for better readability
@@ -26,8 +25,6 @@ const Navbar = () => {
   };
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
-  const { language, setLanguage } = useContext(LanguageContext);
 
   // Improved scroll prevention and cleanup
   useEffect(() => {
@@ -54,37 +51,15 @@ const Navbar = () => {
     setIsOpen(!isOpen);
   };
 
-  const toggleLangDropdown = () => {
-    setIsLangDropdownOpen(!isLangDropdownOpen);
-  };
-
-  const selectLanguage = (lang) => {
-    setLanguage(lang);
-    setIsLangDropdownOpen(false);
-  };
-
-  // Remove Dashboard from navItems
   const navItems = [
     { icon: <Home size={20} />, text: 'Home', link: '/' },
     { icon: <Search size={20} />, text: 'Find', link: '/find' },
     { icon: <Bot size={20} />, text: 'AI', link: '/chatbot' },
+    { icon: <BarChart2 size={20} />, text: 'Dashboard', link: '/dashboard' },
     { icon: <FileText size={20} />, text: 'Legal', link: '/legal' },
     { icon: <Gamepad2 size={20} />, text: 'Learn', link: '/learn' },
     { icon: <Mail size={20} />, text: 'Contact', link: '/contact' },
   ];
-
-  // Language options
-  const languages = [
-    { code: 'en', name: 'English' },
-    { code: 'ta', name: 'Tamil' },
-    { code: 'hi', name: 'Hindi' }
-  ];
-
-  // Language display name
-  const getCurrentLanguageName = () => {
-    const currentLang = languages.find(lang => lang.code === language);
-    return currentLang ? currentLang.name : 'English';
-  };
 
   const navVariants = {
     open: {
@@ -140,27 +115,6 @@ const Navbar = () => {
     }
   };
 
-  const dropdownVariants = {
-    open: {
-      opacity: 1,
-      y: 0,
-      display: "block",
-      transition: {
-        duration: 0.3
-      }
-    },
-    closed: {
-      opacity: 0,
-      y: -10,
-      transition: {
-        duration: 0.3
-      },
-      transitionEnd: {
-        display: "none"
-      }
-    }
-  };
-
   return (
     <header 
       className="shadow-md fixed top-0 left-0 right-0 z-40"
@@ -190,7 +144,7 @@ const Navbar = () => {
           
           {/* Desktop Navigation */}
           <nav 
-            className="hidden md:flex space-x-6 items-center" 
+            className="hidden md:flex space-x-6" 
             aria-label="Desktop Navigation"
           >
             {navItems.map((item, index) => (
@@ -220,66 +174,6 @@ const Navbar = () => {
                 {item.text}
               </motion.a>
             ))}
-            
-            {/* Language Selector Dropdown */}
-            <div className="relative">
-              <motion.button
-                onClick={toggleLangDropdown}
-                className="flex items-center px-3 py-1 rounded-md text-sm font-medium transition-colors"
-                style={{ 
-                  color: colors.text,
-                  opacity: 0.9
-                }}
-                whileHover={{ 
-                  backgroundColor: `${colors.accent}20`,
-                  scale: 1.05,
-                  opacity: 1
-                }}
-                whileTap={{ scale: 0.95 }}
-                aria-expanded={isLangDropdownOpen}
-                aria-label="Select language"
-              >
-                <Globe size={20} className="mr-2" style={{ color: colors.iconColor }} />
-                {getCurrentLanguageName()}
-              </motion.button>
-              
-              <AnimatePresence>
-                {isLangDropdownOpen && (
-                  <motion.div
-                    className="absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
-                    variants={dropdownVariants}
-                    initial="closed"
-                    animate="open"
-                    exit="closed"
-                    style={{ 
-                      backgroundColor: colors.secondary,
-                      borderColor: `${colors.accent}40`,
-                      borderWidth: '1px'
-                    }}
-                  >
-                    <div className="py-1" role="menu" aria-orientation="vertical">
-                      {languages.map((lang) => (
-                        <motion.button
-                          key={lang.code}
-                          className="block w-full text-left px-4 py-2 text-sm"
-                          style={{ 
-                            color: colors.text,
-                            backgroundColor: language === lang.code ? `${colors.accent}30` : 'transparent' 
-                          }}
-                          whileHover={{ 
-                            backgroundColor: `${colors.accent}20`
-                          }}
-                          onClick={() => selectLanguage(lang.code)}
-                          role="menuitem"
-                        >
-                          {lang.name}
-                        </motion.button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
             
             {/* Sign In Button */}
             <motion.a
@@ -377,34 +271,6 @@ const Navbar = () => {
               {item.text}
             </motion.a>
           ))}
-          
-          {/* Language Selector in Mobile */}
-          <motion.div 
-            variants={itemVariants}
-            className="mt-2"
-          >
-            <div className="px-3 py-2 text-sm opacity-70">Select Language</div>
-            <div className="grid grid-cols-3 gap-2 mt-1">
-              {languages.map((lang) => (
-                <motion.button
-                  key={lang.code}
-                  className="flex justify-center items-center px-3 py-2 rounded-md text-base font-medium"
-                  style={{ 
-                    backgroundColor: language === lang.code ? colors.accent : `${colors.accent}30`,
-                    color: colors.text
-                  }}
-                  whileHover={{ 
-                    backgroundColor: colors.accent,
-                    scale: 1.02
-                  }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => selectLanguage(lang.code)}
-                >
-                  {lang.name}
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
           
           {/* Sign In Button */}
           <motion.a
