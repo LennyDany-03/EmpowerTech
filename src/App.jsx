@@ -16,6 +16,8 @@ import SeinorRights from './pages/SeniorRights'
 import RightToInformation from './pages/RightToInformation'
 import LowIncome from './pages/LowIncome'
 
+import SignIn from './pages/Signin'
+
 export const App = () => {
   return (
     <>
@@ -34,6 +36,8 @@ export const App = () => {
             <Route  path='/senior-rights' element={<SeinorRights />}/>
             <Route  path='/rti' element={<RightToInformation />}/>
             <Route  path='/legal-aid' element={<LowIncome />}/>
+
+            <Route  path='/signin' element={<SignIn />}/>
         </Routes>
       </Router>
     </>
