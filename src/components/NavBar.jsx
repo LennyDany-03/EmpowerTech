@@ -324,15 +324,6 @@ const Navbar = () => {
                           My Profile
                         </a>
                         
-                        <a 
-                          href="/settings" 
-                          className="flex items-center px-4 py-2 text-sm hover:bg-gray-100"
-                          onClick={() => setIsDropdownOpen(false)}
-                        >
-                          <Settings size={16} className="mr-2" style={{ color: colors.primary }} />
-                          Settings
-                        </a>
-                        
                         <button 
                           onClick={handleSignOut}
                           className="flex items-center w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
@@ -422,14 +413,6 @@ const Navbar = () => {
                           My Profile
                         </a>
                         
-                        <a 
-                          href="/settings" 
-                          className="flex items-center px-4 py-2 text-sm hover:bg-gray-100"
-                          onClick={() => setIsDropdownOpen(false)}
-                        >
-                          <Settings size={16} className="mr-2" style={{ color: colors.primary }} />
-                          Settings
-                        </a>
                         
                         <button 
                           onClick={handleSignOut}
@@ -600,19 +583,6 @@ const Navbar = () => {
                 >
                   <User size={20} className="mr-3" style={{ color: colors.iconColor }} />
                   My Profile
-                </motion.a>
-                
-                <motion.a
-                  href="/settings"
-                  className="flex items-center px-3 py-3 rounded-md text-base font-medium transition-colors"
-                  style={{ color: colors.text, opacity: 0.9 }}
-                  variants={itemVariants}
-                  whileHover={{ backgroundColor: `${colors.accent}20`, opacity: 1 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={toggleMenu}
-                >
-                  <Settings size={20} className="mr-3" style={{ color: colors.iconColor }} />
-                  Settings
                 </motion.a>
                 
                 <motion.button

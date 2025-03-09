@@ -268,15 +268,6 @@ const SignInPage = () => {
                   </p>
                 </div>
               </div>
-
-              <div className="text-center mt-8">
-                <p style={{ color: '#ffffff' }}>
-                  Don't have an account?{' '}
-                  <a href="/signup" style={{ color: colors.accent, fontWeight: 'bold' }}>
-                    Create one
-                  </a>
-                </p>
-              </div>
             </motion.div>
           </div>
         </div>
