@@ -13,12 +13,13 @@ import {
   AlertTriangle,
   Info,
   Award,
-  Scale
+  Scale,
+  ChevronDown
 } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import ViewDetailPolicy from '../components/ViewDetailPolicy'; // Import the new component
+import ViewDetailPolicy from '../components/ViewDetailPolicy';
 
 const FindPage = () => {
   // Color Palette (same as Legal and HomePage)
@@ -75,6 +76,13 @@ const FindPage = () => {
   const [error, setError] = useState(null);
   const [policies, setPolicies] = useState([]);
   const [filteredPolicies, setFilteredPolicies] = useState([]);
+  
+  // Pagination state
+  const [visiblePolicies, setVisiblePolicies] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const policiesPerPage = 6;
+  const [hasMorePolicies, setHasMorePolicies] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   
   // New state for view detail modal
   const [selectedPolicy, setSelectedPolicy] = useState(null);
@@ -134,68 +142,90 @@ const FindPage = () => {
     }));
   };
 
-// Search and filter handler - Fixed version
-useEffect(() => {
-  if (!policies.length) return;
-  
-  let result = [...policies]; // Create a copy to avoid mutating the original
+  // Search and filter handler - Fixed version
+  useEffect(() => {
+    if (!policies.length) return;
+    
+    let result = [...policies]; // Create a copy to avoid mutating the original
 
-  // Filter by category - Fix: Make case-insensitive comparison
-  if (selectedCategory !== 'All') {
-    result = result.filter(policy => 
-      policy.category.toLowerCase() === selectedCategory.toLowerCase()
-    );
-  }
+    // Filter by category - Fix: Make case-insensitive comparison
+    if (selectedCategory !== 'All') {
+      result = result.filter(policy => 
+        policy.category.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
 
-  // Search filter
-  if (searchQuery) {
-    const lowercaseQuery = searchQuery.toLowerCase();
-    result = result.filter(policy => 
-      policy.name.toLowerCase().includes(lowercaseQuery) ||
-      policy.description.toLowerCase().includes(lowercaseQuery) ||
-      policy.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery))
-    );
-  }
+    // Search filter
+    if (searchQuery) {
+      const lowercaseQuery = searchQuery.toLowerCase();
+      result = result.filter(policy => 
+        policy.name.toLowerCase().includes(lowercaseQuery) ||
+        policy.description.toLowerCase().includes(lowercaseQuery) ||
+        policy.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery))
+      );
+    }
 
-  // Sorting
-  switch (sortMethod) {
-    case 'Latest':
-      result.sort((a, b) => b.id - a.id); // Higher id is newer
-      break;
-    case 'Most Popular':
-      // In a real app, you'd have a popularity field or join with a views/saves table
-      result.sort((a, b) => (a.id % 3) - (b.id % 3)); // Just a mock sorting for demo
-      break;
-    case 'Relevance':
-    default:
-      // For relevance, we'll use a simple approach based on match with user interests
-      if (formData.interests.length > 0) {
-        result.sort((a, b) => {
-          // Check if tags match any user interests
-          const aMatches = a.tags.filter(tag => 
-            formData.interests.some(interest => 
-              tag.toLowerCase().includes(interest.toLowerCase())
-            )
-          ).length;
-          
-          const bMatches = b.tags.filter(tag => 
-            formData.interests.some(interest => 
-              tag.toLowerCase().includes(interest.toLowerCase())
-            )
-          ).length;
-          
-          return bMatches - aMatches; // Higher matches first
-        });
-      }
-      break;
-  }
+    // Sorting
+    switch (sortMethod) {
+      case 'Latest':
+        result.sort((a, b) => b.id - a.id); // Higher id is newer
+        break;
+      case 'Most Popular':
+        // In a real app, you'd have a popularity field or join with a views/saves table
+        result.sort((a, b) => (a.id % 3) - (b.id % 3)); // Just a mock sorting for demo
+        break;
+      case 'Relevance':
+      default:
+        // For relevance, we'll use a simple approach based on match with user interests
+        if (formData.interests.length > 0) {
+          result.sort((a, b) => {
+            // Check if tags match any user interests
+            const aMatches = a.tags.filter(tag => 
+              formData.interests.some(interest => 
+                tag.toLowerCase().includes(interest.toLowerCase())
+              )
+            ).length;
+            
+            const bMatches = b.tags.filter(tag => 
+              formData.interests.some(interest => 
+                tag.toLowerCase().includes(interest.toLowerCase())
+              )
+            ).length;
+            
+            return bMatches - aMatches; // Higher matches first
+          });
+        }
+        break;
+    }
+    
+    setFilteredPolicies(result);
+    // Reset pagination when filters change
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, sortMethod, policies, formData.interests]);
 
-  // Debug log to check filtered result
-  console.log('Filtering with category:', selectedCategory);
-  console.log('Filtered policies:', result.length);
-  
-  setFilteredPolicies(result);
-}, [searchQuery, selectedCategory, sortMethod, policies, formData.interests]);
+  // Update visible policies based on pagination
+  useEffect(() => {
+    if (filteredPolicies.length === 0) {
+      setVisiblePolicies([]);
+      setHasMorePolicies(false);
+      return;
+    }
+    
+    const lastItemIndex = currentPage * policiesPerPage;
+    const newVisiblePolicies = filteredPolicies.slice(0, lastItemIndex);
+    
+    setVisiblePolicies(newVisiblePolicies);
+    setHasMorePolicies(lastItemIndex < filteredPolicies.length);
+  }, [filteredPolicies, currentPage, policiesPerPage]);
+
+  // Load more policies
+  const loadMorePolicies = () => {
+    setLoadingMore(true);
+    setTimeout(() => {
+      setCurrentPage(prev => prev + 1);
+      setLoadingMore(false);
+    }, 500); // Add a small delay to show loading state
+  };
 
   // Save policy handler
   const toggleSavePolicy = async (policy) => {
@@ -269,6 +299,7 @@ useEffect(() => {
       
       setPolicies(policiesWithIcons);
       setFilteredPolicies(policiesWithIcons);
+      setCurrentPage(1); // Reset to first page when searching for new policies
       
     } catch (err) {
       console.error('Error finding matching policies:', err);
@@ -606,17 +637,11 @@ useEffect(() => {
           </h2>
           <div className="flex items-center text-sm">
             <span>Found {filteredPolicies.length} policies</span>
+            <span className="mx-2">|</span>
+            <span>Showing {visiblePolicies.length} policies</span>
             <button 
               className="ml-3 flex items-center text-sm"
               style={{ color: colors.primary }}
-              onClick={() => {
-                // Debug helper - log the current state to console
-                console.log("Current state:", {
-                  selectedCategory,
-                  filteredPolicies,
-                  allPolicies: policies
-                });
-              }}
             >
               <Filter size={16} className="mr-1" />
               Advanced Filters
@@ -649,96 +674,131 @@ useEffect(() => {
             </button>
           </div>
         ) : (
-          // Simpler version without complex animations first to debug
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPolicies.map((policy) => (
-              <div 
-                key={policy.id}
-                className="bg-white rounded-xl shadow-md overflow-hidden transition-all hover:-translate-y-1"
-              >
-                {/* Simple colored header with title and category */}
+          <div>
+            {/* Policy cards */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {visiblePolicies.map((policy) => (
                 <div 
-                  className="p-4"
-                  style={{ 
-                    backgroundColor: 
-                      policy.category === 'Financial' ? colors.primary :
-                      policy.category === 'Social' ? colors.accent :
-                      colors.secondary,
-                    color: colors.background
-                  }}
+                  key={policy.id}
+                  className="bg-white rounded-xl shadow-md overflow-hidden transition-all hover:-translate-y-1"
                 >
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center">
-                      <div className="mr-3">
-                        {policy.icon}
+                  {/* Simple colored header with title and category */}
+                  <div 
+                    className="p-4"
+                    style={{ 
+                      backgroundColor: 
+                        policy.category === 'Financial' ? colors.primary :
+                        policy.category === 'Social' ? colors.accent :
+                        colors.secondary,
+                      color: colors.background
+                    }}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center">
+                        <div className="mr-3">
+                          {policy.icon}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold">{policy.name}</h3>
+                          <span className="text-xs">{policy.category}</span>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-semibold">{policy.name}</h3>
-                        <span className="text-xs">{policy.category}</span>
-                      </div>
+                      <button 
+                        onClick={() => toggleSavePolicy(policy)}
+                      >
+                        <Star 
+                          size={20} 
+                          fill={savedPolicies.some(p => p.id === policy.id) ? "#FFD700" : "none"}
+                          color={savedPolicies.some(p => p.id === policy.id) ? "#FFD700" : colors.background}
+                        />
+                      </button>
                     </div>
-                    <button 
-                      onClick={() => toggleSavePolicy(policy)}
+                  </div>
+                  
+                  {/* Simple card content */}
+                  <div className="p-5">
+                    {/* Description */}
+                    <p className="text-sm mb-4" style={{ color: colors.text }}>
+                      {policy.description}
+                    </p>
+                    
+                    {/* Eligibility */}
+                    <div className="mb-4">
+                      <h4 
+                        className="text-sm font-semibold mb-1"
+                        style={{ color: colors.primary }}
+                      >
+                        Eligibility
+                      </h4>
+                      <p className="text-xs" style={{ color: colors.text }}>
+                        {policy.eligibility}
+                      </p>
+                    </div>
+                    
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {policy.tags && policy.tags.slice(0, 3).map((tag, index) => (
+                        <span 
+                          key={index}
+                          className="text-xs px-2 py-1 rounded-full"
+                          style={{ 
+                            backgroundColor: `${colors.secondary}10`,
+                            color: colors.text
+                          }}
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    {/* View Detail Button */}
+                    <button
+                      className="w-full py-2 rounded-lg text-sm font-medium text-center"
+                      style={{ 
+                        backgroundColor: colors.primary,
+                        color: 'white'
+                      }}
+                      onClick={() => openPolicyDetail(policy)}
                     >
-                      <Star 
-                        size={20} 
-                        fill={savedPolicies.some(p => p.id === policy.id) ? "#FFD700" : "none"}
-                        color={savedPolicies.some(p => p.id === policy.id) ? "#FFD700" : colors.background}
-                      />
+                      View Details
                     </button>
                   </div>
                 </div>
-                
-                {/* Simple card content */}
-                <div className="p-5">
-                  {/* Description */}
-                  <p className="text-sm mb-4" style={{ color: colors.text }}>
-                    {policy.description}
-                  </p>
-                  
-                  {/* Eligibility */}
-                  <div className="mb-4">
-                    <h4 
-                      className="text-sm font-semibold mb-1"
-                      style={{ color: colors.primary }}
-                    >
-                      Eligibility
-                    </h4>
-                    <p className="text-xs" style={{ color: colors.text }}>
-                      {policy.eligibility}
-                    </p>
-                  </div>
-                  
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {policy.tags && policy.tags.slice(0, 3).map((tag, index) => (
-                      <span 
-                        key={index}
-                        className="text-xs px-2 py-1 rounded-full"
-                        style={{ 
-                          backgroundColor: `${colors.secondary}10`,
-                          color: colors.text
-                        }}
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                  
-                  {/* View Detail Button */}
-                  <button
-                    className="w-full py-2 rounded-lg text-sm font-medium text-center"
-                    style={{ 
-                      backgroundColor: colors.primary,
-                      color: 'white'
-                    }}
-                    onClick={() => openPolicyDetail(policy)}
-                  >
-                    View Details
-                  </button>
-                </div>
+              ))}
+            </div>
+
+            {/* Load More Button */}
+            {hasMorePolicies && (
+              <div className="mt-8 text-center">
+                <motion.button
+                  className="px-6 py-4 rounded-lg font-medium flex items-center justify-center mx-auto"
+                  style={{ 
+                    backgroundColor: `${colors.secondary}10`,
+                    color: colors.text
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={loadMorePolicies}
+                  disabled={loadingMore}
+                >
+                  {loadingMore ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 mr-2" 
+                        style={{ borderColor: colors.text }}></div>
+                      Loading More...
+                    </>
+                  ) : (
+                    <>
+                      <span className="mr-2">More Policies</span>
+                      <ChevronDown size={18} />
+                    </>
+                  )}
+                </motion.button>
+                <p className="mt-2 text-sm opacity-70">
+                  Showing {visiblePolicies.length} of {filteredPolicies.length} policies
+                </p>
               </div>
-            ))}
+            )}
           </div>
         )}
 
