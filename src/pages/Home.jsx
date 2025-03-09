@@ -92,33 +92,37 @@ const HomePage = () => {
                 Simplified explanations of financial, social, and legal policies tailored for you.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                <motion.button 
-                  className="px-6 py-3 rounded-lg font-medium flex items-center justify-center shadow-lg"
-                  style={{ 
-                    backgroundColor: colors.primary, 
-                    color: colors.background 
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Search className="mr-2" size={20} />
-                  Find Policies
-                </motion.button>
-                <motion.button 
-                  className="border-2 px-6 py-3 rounded-lg font-medium flex items-center justify-center"
-                  style={{ 
-                    borderColor: colors.primary, 
-                    color: colors.text 
-                  }}
-                  whileHover={{ 
-                    scale: 1.05, 
-                    backgroundColor: `${colors.primary}20` 
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Bot className="mr-2" size={20} />
-                  Ask AI
-                </motion.button>
+                <a href="/find">
+                  <motion.button 
+                    className="px-6 py-3 rounded-lg font-medium flex items-center justify-center shadow-lg"
+                    style={{ 
+                      backgroundColor: colors.primary, 
+                      color: colors.background 
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Search className="mr-2" size={20} />
+                    Find Policies
+                  </motion.button>
+                </a>
+                <a href="/chatbot">
+                  <motion.button 
+                    className="border-2 px-6 py-3 rounded-lg font-medium flex items-center justify-center"
+                    style={{ 
+                      borderColor: colors.primary, 
+                      color: colors.text 
+                    }}
+                    whileHover={{ 
+                      scale: 1.05, 
+                      backgroundColor: `${colors.primary}20` 
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Bot className="mr-2" size={20} />
+                    Ask AI
+                  </motion.button>
+                </a>
               </div>
             </motion.div>
             

@@ -846,18 +846,20 @@ const FindPage = () => {
                   </li>
                 ))}
               </ul>
-              <motion.button 
-                className="mt-6 px-6 py-3 rounded-lg font-medium flex items-center shadow-lg"
-                style={{ 
-                  backgroundColor: colors.accent, 
-                  color: colors.background 
-                }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Bot size={20} className="mr-2" />
-                Chat with AI Assistant
-              </motion.button>
+              <a href="/chatbot">
+                <motion.button 
+                  className="mt-6 px-6 py-3 rounded-lg font-medium flex items-center shadow-lg"
+                  style={{ 
+                    backgroundColor: colors.accent, 
+                    color: colors.background 
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Bot size={20} className="mr-2" />
+                  Chat with AI Assistant
+                </motion.button>
+              </a>
             </div>
             <div className="flex justify-center">
               <Bot 
