@@ -125,7 +125,7 @@ const Navbar = () => {
     { icon: <Bot size={20} />, text: 'AI', link: '/chatbot' },
     { icon: <FileText size={20} />, text: 'Legal', link: '/legal' },
     { icon: <Gamepad2 size={20} />, text: 'Learn', link: '/learn' },
-    { icon: <Mail size={20} />, text: 'Contact', link: '/contact' },
+    { icon: <Mail size={20} />, text: 'About Us', link: '/contact' },
   ];
 
   const navVariants = {
