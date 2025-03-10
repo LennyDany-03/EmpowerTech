@@ -138,7 +138,7 @@ const SignInPage = () => {
               transition={{ duration: 0.8 }}
             >
               <h1 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: colors.background }}>
-                Welcome to <span style={{ color: colors.accent }}>PolicyNavigator</span>
+                Welcome to <span style={{ color: colors.accent }}>Act-Right ✔️</span>
               </h1>
               
               <p className="text-xl mb-8 opacity-80">
