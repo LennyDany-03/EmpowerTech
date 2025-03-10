@@ -264,7 +264,7 @@ const SignInPage = () => {
 
                 <div className="text-center mt-6">
                   <p style={{ color: `${colors.text}60` }} className="text-sm">
-                    By continuing, you agree to PolicyNavigator's <a href="#" style={{ color: colors.primary, textDecoration: 'underline' }}>Terms</a> and <a href="#" style={{ color: colors.primary, textDecoration: 'underline' }}>Privacy</a>.
+                    By continuing, you agree to Act-Right ✔️ <a href="#" style={{ color: colors.primary, textDecoration: 'underline' }}>Terms</a> and <a href="#" style={{ color: colors.primary, textDecoration: 'underline' }}>Privacy</a>.
                   </p>
                 </div>
               </div>
@@ -277,7 +277,7 @@ const SignInPage = () => {
       <footer className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p style={{ color: 'rgba(255,255,255,0.6)' }}>
-            © 2025 PolicyNavigator. All rights reserved.
+            © 2025 Act-Right ✔️. All rights reserved.
           </p>
         </div>
       </footer>
