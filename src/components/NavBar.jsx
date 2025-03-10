@@ -123,7 +123,6 @@ const Navbar = () => {
     { icon: <Home size={20} />, text: 'Home', link: '/' },
     { icon: <Search size={20} />, text: 'Find', link: '/find' },
     { icon: <Bot size={20} />, text: 'AI', link: '/chatbot' },
-    { icon: <BarChart2 size={20} />, text: 'Dashboard', link: '/dashboard' },
     { icon: <FileText size={20} />, text: 'Legal', link: '/legal' },
     { icon: <Gamepad2 size={20} />, text: 'Learn', link: '/learn' },
     { icon: <Mail size={20} />, text: 'Contact', link: '/contact' },

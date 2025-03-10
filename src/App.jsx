@@ -16,6 +16,7 @@ import SeinorRights from './pages/SeniorRights'
 import RightToInformation from './pages/RightToInformation'
 import LowIncome from './pages/LowIncome'
 import Game from './pages/Game'
+import Contact from './pages/Contact'
 
 import SignIn from './pages/Signin'
 import Profile from './pages/Profile'
@@ -39,6 +40,7 @@ export const App = () => {
             <Route  path='/rti' element={<RightToInformation />}/>
             <Route  path='/legal-aid' element={<LowIncome />}/>
             <Route  path='/learn' element={<Game />}/>
+            <Route  path='/contact' element={<Contact />}/>
 
             <Route  path='/signin' element={<SignIn />}/>
             <Route  path='/profile' element={<Profile />}/>

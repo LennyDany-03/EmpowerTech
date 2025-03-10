@@ -234,48 +234,6 @@ const ViewDetailPolicy = ({ policy, isOpen, onClose, savedPolicies, toggleSavePo
                   </div>
                 </div>
               </div>
-              
-              {/* Action buttons */}
-              <div className="flex flex-wrap gap-4 border-t pt-6">
-                <motion.button
-                  className="px-6 py-3 rounded-lg text-sm font-medium flex items-center"
-                  style={{ 
-                    backgroundColor: colors.primary,
-                    color: 'white'
-                  }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Apply Now
-                  <ArrowRight size={16} className="ml-2" />
-                </motion.button>
-                
-                <motion.button
-                  className="px-6 py-3 rounded-lg text-sm font-medium flex items-center"
-                  style={{ 
-                    backgroundColor: `${colors.secondary}10`,
-                    color: colors.text
-                  }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Download size={16} className="mr-2" />
-                  Download Details
-                </motion.button>
-                
-                <motion.button
-                  className="px-6 py-3 rounded-lg text-sm font-medium flex items-center"
-                  style={{ 
-                    backgroundColor: `${colors.secondary}10`,
-                    color: colors.text
-                  }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Share size={16} className="mr-2" />
-                  Share Policy
-                </motion.button>
-              </div>
             </div>
           </motion.div>
         </motion.div>
