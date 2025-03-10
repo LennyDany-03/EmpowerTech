@@ -228,7 +228,7 @@ const Navbar = () => {
               aria-label="PolicyNavigator"
               style={{ color: colors.text }}
             >
-              PolicyNavigator
+              Act-Right ✔️
             </span>
           </motion.div>
           
