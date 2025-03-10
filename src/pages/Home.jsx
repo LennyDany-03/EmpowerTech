@@ -11,7 +11,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import NavBar from '../components/NavBar';
-import Discuess from '../assets/Discuess.jpg'
+import Discuess from '../assets/Discuess1.jpg'
 
 const HomePage = () => {
   // Sophisticated Color Palette
@@ -136,7 +136,7 @@ const HomePage = () => {
                 <img 
                   src={Discuess}
                   alt="Diverse people interacting with policies" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-[700px] object-cover"
                 />
                 <div 
                   className="absolute inset-0 opacity-50"
