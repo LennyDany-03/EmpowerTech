@@ -28,6 +28,7 @@ import {
   CheckCircle,
   Lock
 } from 'lucide-react';
+import axios from 'axios'; // Import axios
 import NavBar from '../components/NavBar';
 import { createClient } from '@supabase/supabase-js';
 
@@ -217,44 +218,15 @@ const Chatbot = () => {
       ]);
   };
 
-  // Generate bot response
+  // Generate bot response using the LLM API
   const generateResponse = async (userMessage) => {
-    // Sample responses based on keywords
-    const responses = {
-      "healthcare": "Universal healthcare is a system where all citizens have access to essential healthcare services regardless of their financial status. It's typically funded through taxes and aims to ensure everyone can receive necessary medical care without financial hardship.\n\nKey components often include:\n\n• Primary care services\n• Hospital care\n• Preventive care\n• Mental health services\n• Prescription medications\n\nDifferent countries implement this in various ways, such as single-payer systems, multi-payer systems, or national health services.",
-      
-      "tax": "Progressive taxation is a tax system where the tax rate increases as the taxable amount increases. This means individuals with higher incomes pay a higher percentage in taxes compared to those with lower incomes, aiming to reduce economic inequality.\n\nKey features include:\n\n• Tax brackets with increasing rates\n• Potential deductions and credits\n• Often applied to income taxes\n• Designed to redistribute wealth\n• Contrasts with flat or regressive tax systems",
-      
-      "environment": "Environmental policies are regulations and guidelines designed to protect natural resources, reduce pollution, and promote sustainable practices. These policies can include emissions standards, protected land designations, and incentives for green energy.\n\nCommon policy tools include:\n\n• Emissions caps and trading systems\n• Protected area designations\n• Green energy subsidies\n• Pollution taxes\n• Environmental impact assessments\n• Waste management regulations",
-      
-      "labor": "Labor rights are legal entitlements related to employment relationships, including fair wages, safe working conditions, freedom from discrimination, and the right to organize. These protections help ensure workers are treated fairly and with dignity.\n\nKey labor rights often include:\n\n• Minimum wage guarantees\n• Workplace safety standards\n• Protection from discrimination\n• Right to form unions and collective bargaining\n• Paid leave (sick, vacation, parental)\n• Limitations on working hours\n• Protection from unfair dismissal",
-      
-      "housing": "Affordable housing policies aim to ensure people have access to adequate housing they can afford. These may include rent control, housing subsidies, tax incentives for developers to build affordable units, and zoning regulations to encourage mixed-income communities.\n\nCommon approaches include:\n\n• Rent control or stabilization\n• Housing vouchers and subsidies\n• Inclusionary zoning requirements\n• Public housing developments\n• Tax credits for affordable housing development\n• Community land trusts\n• First-time homebuyer assistance programs",
-      
-      "education": "Education policies govern how educational systems operate, covering areas like curriculum standards, school funding, teacher qualifications, and educational accessibility. They aim to provide quality education opportunities for all citizens.\n\nEducation policy areas include:\n\n• School funding formulas\n• Curriculum standards and testing\n• Teacher certification requirements\n• Special education services\n• Higher education financing\n• Early childhood education\n• School choice and charter schools\n• Student loan programs",
-      
-      "immigration": "Immigration policies regulate how foreign nationals enter, live, and work in a country. These include visa requirements, pathways to citizenship, refugee protocols, and enforcement mechanisms. They balance national security, economic needs, and humanitarian concerns.\n\nKey immigration policy components include:\n\n• Visa categories and quotas\n• Pathways to permanent residency and citizenship\n• Border security measures\n• Refugee and asylum systems\n• Employment authorization\n• Family reunification provisions\n• Integration and settlement services",
-      
-      "social security": "Social Security provides financial benefits to retirees, disabled individuals, and families of retired, disabled or deceased workers. The program is funded through payroll taxes and designed to provide a safety net for vulnerable populations.\n\nKey elements include:\n\n• Retirement benefits based on work history\n• Disability insurance\n• Survivor benefits for families\n• Supplemental Security Income (SSI) for low-income elderly or disabled\n• Cost-of-living adjustments\n• Medicare eligibility at retirement age",
-      
-      "hello": "Hello! I'm your Policy Learning Assistant. I can help explain various government policies, regulations, and programs. What would you like to know about today?\n\nI can provide information about:\n\n• Healthcare policies\n• Tax systems\n• Environmental regulations\n• Labor and employment laws\n• Housing programs\n• Education policies\n• And many other government programs"
-    };
-    
-    // Find matching keywords
-    let responseText = "I don't have specific information about that topic yet. Let me suggest exploring our Policy Learning Challenge to learn more about various government policies.\n\nYou might want to try asking about:\n\n• Healthcare systems\n• Tax policies\n• Environmental regulations\n• Labor rights\n• Housing programs\n• Education funding";
-    
-    Object.keys(responses).forEach(keyword => {
-      if (userMessage.toLowerCase().includes(keyword)) {
-        responseText = responses[keyword];
-      }
-    });
-    
-    // Simulate delay for realistic typing effect
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(responseText);
-      }, 1500);
-    });
+    try {
+      const res = await axios.post("http://localhost:5000/ask", { prompt: userMessage });
+      return res.data.response;
+    } catch (error) {
+      console.error("Error calling LLM API:", error);
+      return "I'm sorry, I'm having trouble connecting to my knowledge base right now. Please try again later.";
+    }
   };
 
   // Handle sending a message
@@ -280,7 +252,7 @@ const Chatbot = () => {
     setIsTyping(true);
     setLoading(true);
     
-    // Generate response
+    // Generate response using the LLM API
     const response = await generateResponse(input);
     
     // Hide typing indicator
@@ -745,6 +717,7 @@ const Chatbot = () => {
               )}
             </AnimatePresence>
             
+            {/* Rest of the component (no changes needed after this point) */}
             {/* Sidebar Toggle Button (visible when sidebar is hidden) */}
             <AnimatePresence>
               {!showSidebar && (
@@ -1253,7 +1226,6 @@ const Chatbot = () => {
                   <div className="flex space-x-2">
                     <button 
                       className="p-1 rounded text-xs text-gray-500 hover:bg-gray-100 flex items-center"
-                      onClick={() => setShowSuggestions(true)}
                     >
                       <Sparkles size={12} className="mr-1" />
                       <span>Suggestions</span>
